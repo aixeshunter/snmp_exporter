@@ -63,6 +63,53 @@ This setup allows Prometheus to provide scheduling and service discovery, as
 unlike all other exporters running an exporter on the machine from which we are
 getting the metrics from is not possible.
 
+## Promehteus Operator Configuration
+
+ServiceMonitor Config:
+```YAML
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    prometheus: kube-prometheus
+  name: snmp-exporter
+spec:
+  jobLabel: snmp-exporter
+  selector:
+    app: snmp-exporter
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  endpoints:
+  - interval: 60s
+    port: http-metrics
+    params:
+      module:
+      - if_mib_ifdescr
+      target:
+      - 10.161.XX.YY
+    path: "/snmp"
+    scrapeTimeout: 10s
+    targetPort: 9116
+    metricRelabelings:
+    - sourceLabels: [__address__]
+      targetLabel: __param_target
+    - sourceLabels: [__param_target]
+      targetLabel: instance
+    - sourceLabels: __address__
+      replacement: snmp-exporter.monitoring.svc.cluster.local:9116
+  - interval: 60s
+    port: http-metrics
+    params:
+      module:
+      - if_mib_ifdescr
+      target:
+      - 10.161.XX.YZ
+    path: "/snmp"
+    scrapeTimeout: 10s
+    targetPort: 9116
+```
+
 ## Large counter value handling
 
 In order to provide accurate counters for large Counter64 values, the exporter will automatically
