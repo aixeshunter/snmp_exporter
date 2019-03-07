@@ -1,7 +1,7 @@
 modules:
   if_mib:
     walk: [scCtlrName, scCtlrStatus, scDiskNamePosition, scDiskHealthy, scVolumeName, scVolumeStatus]
-    retries: 2
+    retries: 4
     timeout: 3s
     auth:
       community: dell-ipsan
